@@ -1,34 +1,39 @@
 # 3. Count number of movie ratings per month using sql query (using temp views).
 
-# import the packages
+# Import the packages
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 
-# build spark session
+# Build Spark session
 spark = SparkSession.builder\
     .appName('Assign5 Q3')\
     .getOrCreate()
 
-# load movies data and create dataframe
+# Load movies data and create DataFrame
 movies_df = spark.read\
-    .option('header','true')\
-    .option('inferSchema','true')\
+    .option('header', 'true')\
+    .option('inferSchema', 'true')\
     .csv('/home/abhishek/Desktop/BigData/data/movies/movies.csv')
 
-# test dataframe
+# Test movies DataFrame
 # movies_df.printSchema()
 # movies_df.show()
 
-# load rating data and create dataframe
+# Load rating data and create DataFrame
 ratings_df = spark.read\
-    .option('header','true')\
-    .option('inferSchema','true')\
+    .option('header', 'true')\
+    .option('inferSchema', 'true')\
     .csv('/home/abhishek/Desktop/BigData/data/movies/ratings.csv')
 
-ratings_df2 = ratings_df.
-# test rating dataframe
-ratings_df.printSchema()
-ratings_df.show()
+# Convert the epoch timestamp to a readable timestamp
+ratings_df2 = ratings_df.withColumn('timestamp', from_unixtime(col('timestamp')).alias('timestamp'))
 
-# stop spark session
+# Select required columns
+ratings_df2 = ratings_df2.select('userId', 'movieId', 'rating', year('timestamp'))
+
+# Test ratings DataFrame
+ratings_df2.printSchema()
+ratings_df2.show()
+
+# Stop Spark session
 spark.stop()
